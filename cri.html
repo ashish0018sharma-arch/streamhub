@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamHub - Live TV & Matches</title>
+    <link rel="icon" href="https://img.icons8.com/color/48/domain.png" type="image/png">
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #090d16 0%, #121826 100%); 
+            color: #f8fafc; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            min-height: 100vh;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .logo-img { width: 45px; height: 45px; }
+        h1 { color: #38bdf8; margin: 0; font-size: 26px; }
+        p { color: #94a3b8; margin: 5px 0 20px 0; text-align: center; font-size: 14px; }
+        .main-wrapper { max-width: 900px; margin: 0 auto; display: grid; gap: 20px; }
+        .container { background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155; }
+        
+        .player-box {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 12px;
+        }
+        .player-box iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* Watermark / Telegram Button ko chupane ke liye Cover Box */
+        .watermark-cover {
+            position: absolute;
+            top: 10px;    /* Agar button upar hai */
+            left: 10px;   /* Agar left me hai toh left, right me hai toh right karein */
+            width: 250px; /* Cover ki width adjust karein */
+            height: 80px; /* Cover ki height adjust karein */
+            background: #f2efef; /* Player ke background jaisa color */
+            z-index: 10;
+            border-radius: 6px;
+            pointer-events: none; /* Taki iske upar click na ruke */
+        }
+
+        .link-buttons { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+            margin-top: 20px;
+        }
+        .link-btn { 
+            background: #0f172a; 
+            color: #f8fafc; 
+            padding: 12px 22px; 
+            border: 2px solid #334155; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 14px;
+            transition: all 0.3s ease; 
+        }
+        .link-btn:hover, .link-btn.active { 
+            background: #0284c7; 
+            border-color: #38bdf8; 
+        }
+        .history-box {
+            background: #1e293b;
+            padding: 15px 20px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+        }
+        .history-box h3 { margin: 0 0 10px 0; font-size: 16px; color: #38bdf8; }
+        #historyList { margin: 0; padding-left: 20px; color: #94a3b8; font-size: 13px; }
+        #historyList li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img class="logo-img" src="https://img.icons8.com/color/96/domain.png" alt="Logo">
+        <h1>StreamHub</h1>
+    </header>
+    <p>Enjoy Free Live Matches in HD Quality</p>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Video Player Frame -->
+            <div class="player-box">
+                <!-- Yeh cover box watermark ko chupane ke liye hai -->
+                <div class="watermark-cover"></div>
+                
+                <iframe id="mainPlayer" src="https://ci365.pages.dev/PHINDI" allowfullscreen allow="encrypted-media"></iframe>
+            </div>
+
+            <!-- Server Selection Buttons -->
+            <div class="link-buttons">
+                <button class="link-btn active" onclick="changeStream('https://ci365.pages.dev/PHINDI', 'Server 1', this)">📺 Server</button>
+                <button class="link-btn" onclick="changeStream('https://ci365.pages.dev/HIND2', 'Server 2', this)">⚡Hindi (Backup Server)</button>
+                <button class="link-btn" onclick="changeStream('https://ci365.pages.dev/PENGLISH','English Server', this)">🔥 English Server</button>
+            </div>
+        </div>
+
+        
+    </div>
+
+    <script>
+        let historyArray = [];
+
+        function changeStream(url, channelName, btnElement) {
+            let player = document.getElementById('mainPlayer');
+            player.src = url;
+            
+            let buttons = document.querySelectorAll('.link-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            let timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            let historyText = `${channelName} (Played at ${timeNow})`;
+            
+            historyArray.unshift(historyText);
+            if(historyArray.length > 5) historyArray.pop();
+            
+            let listHTML = '';
+            historyArray.forEach(item => {
+                listHTML += `<li>${item}</li>`;
+            });
+            document.getElementById('historyList').innerHTML = listHTML;
+        }
+    </script>
+
+</body>
+</html>
